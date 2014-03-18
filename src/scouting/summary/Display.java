@@ -66,7 +66,7 @@ public class Display extends javax.swing.JPanel {
         chart1.setLayout(chart1Layout);
         chart1Layout.setHorizontalGroup(
             chart1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 236, Short.MAX_VALUE)
+            .addGap(0, 258, Short.MAX_VALUE)
         );
         chart1Layout.setVerticalGroup(
             chart1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -75,11 +75,14 @@ public class Display extends javax.swing.JPanel {
 
         add(chart1);
 
-        jPanel1.setBackground(new java.awt.Color(242, 255, 254));
-        jPanel1.setPreferredSize(new java.awt.Dimension(100, 52));
+        jPanel1.setBackground(new java.awt.Color(209, 209, 209));
+        jPanel1.setMaximumSize(new java.awt.Dimension(80, 32789));
+        jPanel1.setMinimumSize(new java.awt.Dimension(80, 64));
+        jPanel1.setPreferredSize(new java.awt.Dimension(80, 10));
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
 
-        nameField.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        nameField.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        nameField.setForeground(new java.awt.Color(0, 0, 0));
         nameField.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         nameField.setText("WWWWW");
         nameField.setVerticalAlignment(javax.swing.SwingConstants.TOP);
@@ -89,32 +92,34 @@ public class Display extends javax.swing.JPanel {
         jPanel3.setAlignmentY(0.0F);
         jPanel3.setLayout(new java.awt.GridLayout(3, 2));
 
+        fSI.setFont(new java.awt.Font("Serif", 1, 12)); // NOI18N
         fSI.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        fSI.setText("SI");
+        fSI.setText("+Last");
         jPanel3.add(fSI);
 
+        fFI.setFont(new java.awt.Font("Serif", 1, 12)); // NOI18N
         fFI.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        fFI.setText("FI");
+        fFI.setText("-Last");
         jPanel3.add(fFI);
 
-        fS3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        fS3.setFont(new java.awt.Font("Serif", 0, 12)); // NOI18N
         fS3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        fS3.setText("S3");
+        fS3.setText("+Rec");
         jPanel3.add(fS3);
 
-        fF3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        fF3.setFont(new java.awt.Font("Serif", 0, 12)); // NOI18N
         fF3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        fF3.setText("F3");
+        fF3.setText("-Rec");
         jPanel3.add(fF3);
 
-        fSA.setFont(new java.awt.Font("Dialog", 2, 12)); // NOI18N
+        fSA.setFont(new java.awt.Font("Serif", 2, 12)); // NOI18N
         fSA.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        fSA.setText("SA");
+        fSA.setText("+All");
         jPanel3.add(fSA);
 
-        fFA.setFont(new java.awt.Font("Dialog", 2, 12)); // NOI18N
+        fFA.setFont(new java.awt.Font("Serif", 2, 12)); // NOI18N
         fFA.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        fFA.setText("FA");
+        fFA.setText("-All");
         jPanel3.add(fFA);
 
         jPanel1.add(jPanel3);

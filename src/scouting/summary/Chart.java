@@ -31,6 +31,10 @@ public class Chart extends JPanel {
         new Color(0, 0, 0)
     };
 
+    public static final int FULL_BLACK = 0;
+    public static final int EMPTY = 1;
+    public static final int FULL_GRAY = 2;
+
     public void paintIt(Graphics2D g) {
         int w = this.getWidth();
         int h = this.getHeight();
@@ -41,8 +45,8 @@ public class Chart extends JPanel {
             return;
         }
 
-        int wh = w / (int) data.length;
-        int hs = h / (int) max;
+        int wh = w / data.length + 1;
+        int hs = h / max + 1;
 
         for (int x = 0; x < data.length; x++) {
             int[] d = data[x];
@@ -50,11 +54,31 @@ public class Chart extends JPanel {
             int o = x * wh;
             for (int y = 0; y < shades.length; y++) {
                 int v = d[y];
+                if (v == 0) {
+                    continue;
+                }
                 int j = v * hs * scales[y];
-                g.setColor(COLORS[shades[y]]);
-                g.fillRect(o, h - b - j, wh, j);
+
+                drawRect(g, shades[y], o, h - b - j, wh, j);
                 b += j;
             }
+        }
+    }
+
+    private static void drawRect(Graphics2D g, int color, int x, int y, int w, int h) {
+        switch (color) {
+            case FULL_BLACK:
+                g.setColor(Color.BLACK);
+                g.fillRect(x, y, w, h);
+                break;
+            case FULL_GRAY:
+                g.setColor(Color.LIGHT_GRAY);
+                g.fillRect(x, y, w, h);
+                break;
+            case EMPTY:
+                g.setColor(Color.BLACK);
+                g.drawRect(x, y, w, h);
+                break;
         }
     }
 

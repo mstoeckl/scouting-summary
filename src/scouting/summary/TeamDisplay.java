@@ -13,7 +13,6 @@ public class TeamDisplay extends javax.swing.JPanel {
     public TeamDisplay() {
         initComponents();
         teamData = null;
-        teamNum.setText("????");
 
         display1.setType("Auto");
         display2.setType("Foul");
@@ -63,41 +62,54 @@ public class TeamDisplay extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         teamNum = new javax.swing.JLabel();
-        display4 = new scouting.summary.Display();
-        display3 = new scouting.summary.Display();
-        display2 = new scouting.summary.Display();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 10), new java.awt.Dimension(0, 10), new java.awt.Dimension(32767, 10));
         statsText = new javax.swing.JLabel();
-        display6 = new scouting.summary.Display();
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
+        jPanel2 = new javax.swing.JPanel();
         display1 = new scouting.summary.Display();
-        stats = new javax.swing.JPanel();
+        display2 = new scouting.summary.Display();
+        display3 = new scouting.summary.Display();
+        display4 = new scouting.summary.Display();
         display5 = new scouting.summary.Display();
+        display6 = new scouting.summary.Display();
 
         setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         setMaximumSize(new java.awt.Dimension(900, 200));
         setMinimumSize(new java.awt.Dimension(900, 200));
         setPreferredSize(new java.awt.Dimension(900, 200));
-        setLayout(new java.awt.GridLayout(2, 4, 10, 10));
+        setLayout(new java.awt.BorderLayout());
 
-        teamNum.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
-        teamNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        teamNum.setText("####");
-        add(teamNum);
-        add(display4);
-        add(display3);
-        add(display2);
+        jPanel1.setMinimumSize(new java.awt.Dimension(150, 126));
+        jPanel1.setPreferredSize(new java.awt.Dimension(150, 10));
+        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
 
-        statsText.setText("<html>statistics<br/>Foo</html>");
+        teamNum.setFont(new java.awt.Font("Serif", 1, 48)); // NOI18N
+        teamNum.setText("?????");
+        teamNum.setAlignmentX(0.5F);
+        jPanel1.add(teamNum);
+        jPanel1.add(filler1);
+
+        statsText.setFont(new java.awt.Font("Serif", 0, 12)); // NOI18N
+        statsText.setText("<html> Here go: pit scouting info <br/> So: what teams say they do <br/> But: not what they do do <br/> Like: what their bot could do </html>");
         statsText.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        add(statsText);
-        add(display6);
-        add(display1);
+        statsText.setAlignmentX(0.5F);
+        statsText.setAlignmentY(0.0F);
+        jPanel1.add(statsText);
+        jPanel1.add(filler2);
 
-        stats.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        stats.setLayout(new java.awt.BorderLayout());
-        stats.add(display5, java.awt.BorderLayout.CENTER);
+        add(jPanel1, java.awt.BorderLayout.WEST);
 
-        add(stats);
+        jPanel2.setLayout(new java.awt.GridLayout(2, 3));
+        jPanel2.add(display1);
+        jPanel2.add(display2);
+        jPanel2.add(display3);
+        jPanel2.add(display4);
+        jPanel2.add(display5);
+        jPanel2.add(display6);
+
+        add(jPanel2, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -107,7 +119,10 @@ public class TeamDisplay extends javax.swing.JPanel {
     private scouting.summary.Display display4;
     private scouting.summary.Display display5;
     private scouting.summary.Display display6;
-    private javax.swing.JPanel stats;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel statsText;
     private javax.swing.JLabel teamNum;
     // End of variables declaration//GEN-END:variables

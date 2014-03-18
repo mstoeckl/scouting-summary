@@ -30,7 +30,7 @@ public class TeamRecord {
         "OtherTech"};
 
     public static String[] sck = {
-        "Drive", "Intake", "Shooter", "Loads", "Goals"
+        "Drive", "Intake", "Shooter", "Loads", "Goals", "Pass"
     };
 
     private final int[][] matches;
@@ -205,26 +205,28 @@ public class TeamRecord {
         public final int intensity;
         public final String key;
         public final int scale;
+        public final String label;
 
-        public SKS(String s, int i) {
-            this.key = s;
-            this.intensity = i;
-            this.scale = 1;
-        }
-
-        public SKS(String s, int i, int scale) {
+        public SKS(String s, int i, String label, int scale) {
             this.key = s;
             this.intensity = i;
             this.scale = scale;
+            this.label = label;
+        }
+
+        public SKS(String s, int i, String label) {
+            this.key = s;
+            this.intensity = i;
+            this.scale = 1;
+            this.label = label;
         }
     }
 
     private final Subgraph AutoRules = new Subgraph() {
         @Override
         public int getSuccess(int m) {
-            return getField(m, "AHighHot") * 20 + getField(m, "AHighCold") * 15
-                    + getField(m, "ALowHot") * 11 + getField(m, "ALowCold") * 6
-                    + getField(m, "AMobility") * 5;
+            return getField(m, "AHighHot") + getField(m, "AHighCold")
+                    + getField(m, "ALowHot") + getField(m, "ALowCold");
         }
 
         @Override
@@ -234,7 +236,7 @@ public class TeamRecord {
 
         @Override
         public int getGraphMax() {
-            return 65;
+            return 3;
         }
 
         @Override
@@ -243,13 +245,12 @@ public class TeamRecord {
         }
 
         private final SKS[] is = new SKS[]{
-            new SKS("AMobility", 3, 5),
-            new SKS("AHighHot", 4, 20),
-            new SKS("AHighCold", 3, 15),
-            new SKS("ALowHot", 4, 11),
-            new SKS("ALowCold", 3, 6),
-            new SKS("AHighMiss", 2, 5),
-            new SKS("ALowMiss", 1, 5)
+            new SKS("AHighHot", Chart.FULL_BLACK, "H+"),
+            new SKS("AHighCold", Chart.FULL_GRAY, "H"),
+            new SKS("ALowHot", Chart.FULL_BLACK, "L+"),
+            new SKS("ALowCold", Chart.FULL_GRAY, "L"),
+            new SKS("AHighMiss", Chart.EMPTY, "Miss"),
+            new SKS("ALowMiss", Chart.EMPTY, "Miss")
         };
     };
 
@@ -276,14 +277,14 @@ public class TeamRecord {
         }
 
         private final SKS[] is = new SKS[]{
-            new SKS("G12", 4),
-            new SKS("G28", 3),
-            new SKS("G40", 2),
-            new SKS("OtherTech", 1)
+            new SKS("G12", Chart.FULL_BLACK, "G12"),
+            new SKS("G28", Chart.FULL_BLACK, "G28"),
+            new SKS("G40", Chart.FULL_BLACK, "G40"),
+            new SKS("OtherTech", Chart.FULL_BLACK, "??")
         };
     };
 
-    private Subgraph ABGraph(final String good, final String bad, final int max) {
+    private Subgraph ABGraph(final String good, final String bad, final int max, final String gl, final String bl) {
         return new Subgraph() {
             @Override
             public int getSuccess(int m) {
@@ -306,14 +307,14 @@ public class TeamRecord {
             }
 
             private final SKS[] is = new SKS[]{
-                new SKS(good, 4),
-                new SKS(bad, 1)
+                new SKS(good, Chart.FULL_BLACK, gl),
+                new SKS(bad, Chart.EMPTY, bl)
             };
         };
     }
 
-    private final Subgraph TrussRules = ABGraph("Truss", "TrussMiss", 10);
-    private final Subgraph CatchRules = ABGraph("Catch", "CatchMiss", 5);
-    private final Subgraph HighRules = ABGraph("High", "HighMiss", 10);
-    private final Subgraph LowRules = ABGraph("Low", "LowMiss", 10);
+    private final Subgraph TrussRules = ABGraph("Truss", "TrussMiss", 10, "+", "-");
+    private final Subgraph CatchRules = ABGraph("Catch", "CatchMiss", 5, "+", "-");
+    private final Subgraph HighRules = ABGraph("High", "HighMiss", 10, "+", "-");
+    private final Subgraph LowRules = ABGraph("Low", "LowMiss", 10, "+", "-");
 }

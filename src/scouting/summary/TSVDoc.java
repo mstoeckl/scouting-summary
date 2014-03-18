@@ -10,7 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class CSVDoc {
+public class TSVDoc {
 
     String[] header;
     String[][] data;
@@ -20,7 +20,7 @@ public class CSVDoc {
      *
      * @param file
      */
-    public CSVDoc(String file) {
+    public TSVDoc(String file) {
 
         String[] lines;
         ArrayList<String> s = new ArrayList<>();

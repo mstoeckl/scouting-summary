@@ -57,8 +57,11 @@ public class Main extends javax.swing.JFrame {
         bind(jFormattedTextField5, teamDisplay5);
         bind(jFormattedTextField6, teamDisplay6);
 
-        CSVDoc matches = new CSVDoc("matches.csv");
-        CSVDoc pitscout = new CSVDoc("scouting.csv");
+        jScrollPane1.getHorizontalScrollBar().setUnitIncrement(40);
+        jScrollPane1.getVerticalScrollBar().setUnitIncrement(40);
+
+        TSVDoc matches = new TSVDoc("matches.tsv");
+        TSVDoc pitscout = new TSVDoc("scouting.tsv");
         loadData(matches, pitscout);
     }
 
@@ -112,7 +115,7 @@ public class Main extends javax.swing.JFrame {
 
     private final SortedMap<Integer, TeamRecord> records = new TreeMap<>();
 
-    private void loadData(CSVDoc mts, CSVDoc sct) {
+    private void loadData(TSVDoc mts, TSVDoc sct) {
         Map<Integer, SortedMap<Integer, int[]>> uuv = new TreeMap<>();
         for (String[] v : mts.data) {
             int[] f = new int[v.length - 1];

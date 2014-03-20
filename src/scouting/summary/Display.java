@@ -12,19 +12,18 @@ public class Display extends javax.swing.JPanel {
      */
     public Display() {
         initComponents();
-        name = "";
     }
 
-    private String name;
+    private GraphRules rules;
 
-    public void setType(String s) {
-        name = s;
-        nameField.setText(s);
+    public void setType(GraphRules g) {
+        nameField.setText(g.getName());
+        rules = g;
     }
 
     public void loadData(TeamRecord r) {
-        double[] p = r.getSuccesses(name);
-        double[] f = r.getFailures(name);
+        double[] p = r.getSuccesses(rules);
+        double[] f = r.getFailures(rules);
         fSI.setText(String.format("%2.1f", p[0]));
         fS3.setText(String.format("%2.1f", p[1]));
         fSA.setText(String.format("%2.1f", p[2]));
@@ -32,10 +31,10 @@ public class Display extends javax.swing.JPanel {
         fF3.setText(String.format("%2.1f", f[1]));
         fFA.setText(String.format("%2.1f", f[2]));
 
-        chart1.setMax(r.getMaxHeight(name));
-        chart1.setShades(r.getShades(name));
-        chart1.setData(r.getGraphData(name));
-        chart1.setScales(r.getScales(name));
+        chart1.setMax(r.getMaxHeight(rules));
+        chart1.setShades(r.getShades(rules));
+        chart1.setData(r.getGraphData(rules));
+        chart1.setScales(r.getScales(rules));
     }
 
     /**

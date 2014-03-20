@@ -14,12 +14,12 @@ public class TeamDisplay extends javax.swing.JPanel {
         initComponents();
         teamData = null;
 
-        display1.setType("Auto");
-        display2.setType("Foul");
-        display3.setType("Truss");
-        display4.setType("Catch");
-        display5.setType("High");
-        display6.setType("Low");
+        display1.setType(GraphRules.AutoRules);
+        display2.setType(GraphRules.MiscRules);
+        display3.setType(GraphRules.TrussRules);
+        display4.setType(GraphRules.PickupRules);
+        display5.setType(GraphRules.HighRules);
+        display6.setType(GraphRules.LowRules);
     }
 
     private TeamRecord teamData;

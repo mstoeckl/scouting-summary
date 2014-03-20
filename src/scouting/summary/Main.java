@@ -15,6 +15,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -150,6 +151,9 @@ public class Main extends javax.swing.JFrame {
             ms.put(Integer.parseInt(kl[0]), v);
         }
 
+        String[] matchheader = clip(mts.header, 1);
+        String[] scoutheader = clip(sct.header, 1);
+
         Set<Integer> teams = new TreeSet<>();
         teams.addAll(mr.keySet());
         teams.addAll(ms.keySet());
@@ -158,9 +162,19 @@ public class Main extends javax.swing.JFrame {
             int team = ee.next();
             int[][] mss = mr.get(team);
             String[] css = ms.get(team);
-            records.put(team, new TeamRecord(team, mss == null ? new int[0][] : mss,
-                    css == null ? new String[0] : css));
+            records.put(team, new TeamRecord(team, matchheader, mss == null ? new int[0][] : mss,
+                    css == null ? new String[0] : css, scoutheader));
         }
+    }
+
+    private static String[] clip(String[] s, int cut) {
+        System.out.println(Arrays.toString(s));
+        String[] out = new String[s.length - cut];
+        for (int i = cut; i < s.length; i++) {
+            out[i - cut] = s[i];
+        }
+        System.out.println(Arrays.toString(out));
+        return out;
     }
 
     /**

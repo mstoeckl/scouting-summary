@@ -8,6 +8,7 @@ package scouting.summary;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import javax.swing.JPanel;
 
 public class Chart extends JPanel {
@@ -23,17 +24,9 @@ public class Chart extends JPanel {
         max = 1;
     }
 
-    public static final Color[] COLORS = new Color[]{
-        new Color(200, 200, 200),
-        new Color(150, 150, 150),
-        new Color(100, 100, 100),
-        new Color(50, 50, 50),
-        new Color(0, 0, 0)
-    };
-
-    public static final int FULL_BLACK = 0;
-    public static final int EMPTY = 1;
-    public static final int FULL_GRAY = 2;
+    public static final int FULL = 0;
+    public static final int CLEAR = 1;
+    public static final int MEDIUM = 2;
 
     public void paintIt(Graphics2D g) {
         int w = this.getWidth();
@@ -65,21 +58,27 @@ public class Chart extends JPanel {
         }
     }
 
+    private static final Color DARK = new Color(50, 50, 50);
+    private static final Color MID = new Color(150, 150, 150);
+    private static final Color LIGHT = new Color(255, 255, 255);
+
     private static void drawRect(Graphics2D g, int color, int x, int y, int w, int h) {
+        Rectangle area = new Rectangle(x, y, w, h);
+        g.setColor(Color.BLACK);
+        g.fill(area);
+        area.grow(-1, -1);
         switch (color) {
-            case FULL_BLACK:
-                g.setColor(Color.BLACK);
-                g.fillRect(x, y, w, h);
+            case FULL:
+                g.setColor(DARK);
                 break;
-            case FULL_GRAY:
-                g.setColor(Color.LIGHT_GRAY);
-                g.fillRect(x, y, w, h);
+            case MEDIUM:
+                g.setColor(MID);
                 break;
-            case EMPTY:
-                g.setColor(Color.BLACK);
-                g.drawRect(x, y, w, h);
+            case CLEAR:
+                g.setColor(LIGHT);
                 break;
         }
+        g.fill(area);
     }
 
     @Override

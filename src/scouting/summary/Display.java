@@ -22,6 +22,16 @@ public class Display extends javax.swing.JPanel {
     }
 
     public void loadData(TeamRecord r) {
+        if (r == null) {
+            fSI.setText("+Last");
+            fS3.setText("+Rec");
+            fSA.setText("+All");
+            fFI.setText("-Last");
+            fF3.setText("-Rec");
+            fFA.setText("-All");
+            chart1.setData(new int[0][]);
+            return;
+        }
         double[] p = r.getSuccesses(rules);
         double[] f = r.getFailures(rules);
         fSI.setText(String.format("%2.1f", p[0]));

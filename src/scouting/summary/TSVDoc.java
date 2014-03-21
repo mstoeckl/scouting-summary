@@ -30,11 +30,10 @@ public class TSVDoc {
             while ((u = r.readLine()) != null) {
                 s.add(u);
             }
-            lines = s.toArray(new String[s.size()]);
         } catch (IOException e) {
-            lines = new String[0];
             e.printStackTrace(System.err);
         }
+        lines = s.toArray(new String[s.size()]);
 
         if (lines.length > 0) {
             header = lines[0].split(" *\t *");
@@ -46,5 +45,10 @@ public class TSVDoc {
             header = new String[0];
             data = new String[0][];
         }
+    }
+
+    public TSVDoc() {
+        header = new String[0];
+        data = new String[0][];
     }
 }

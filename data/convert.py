@@ -26,9 +26,22 @@ def readcsv(filename):
 
     return header, rest
 
+lastmode = "Qualification"
+def modecv(blob):
+    global lastmode
+    if blob == "none":
+        return lastmode
+
+    s = blob.split(",")
+    if len(s) != 1 and lastmode in s:
+            return lastmode
+    lastmode = s[0]
+    return s[0]
+
+
 lastmatch = 0
 matchcount = 0
-def matchcv(blob, mode):
+def matchcv(blob):
     global lastmatch
     global matchcount
 
@@ -119,8 +132,10 @@ def convert(line, header):
 
     o = {}
 
+    md = modecv(d["Match Type"])
+
     o["Team"] = iconv(d["Team"])
-    o["Match"] = matchcv(d["Match"],d["Match Type"])
+    o["Match"] = matchcv(d["Match"])
     if bconv(d["A Hot"]):
         o["AutoHighHot"] = iconv(d["A High"])
         o["AutoLowHot"] = iconv(d["A Low"])
@@ -156,7 +171,7 @@ def convert(line, header):
         o["EtcGoalie"] = 0
     o["EtcGoalieBlock"] = bconv(d["A Goalie Block"])
 
-    return [o[f] for f in fields]
+    return md, [o[f] for f in fields]
 
 def writetsv(filename, header, data):
     with open(filename, "w") as f:
@@ -165,8 +180,20 @@ def writetsv(filename, header, data):
             f.write("\t".join(map(str, line)) + "\n")
 
 header, data = readcsv("aerialassist.csv")
-out = [convert(x, header) for x in data]
-writetsv("matches.tsv",fields, out)
+practice = []
+qualification = []
+elimination = []
+for x in data:
+    mode, line = convert(x, header)
+    if mode == "Practice":
+        practice.append(line)
+    if mode == "Qualification":
+        qualification.append(line)
+    if mode == "Elimination":
+        elimination.append(line)
+writetsv("practice.tsv",fields, practice)
+writetsv("qualification.tsv",fields, qualification)
+writetsv("elimination.tsv",fields, elimination)
 
 
 

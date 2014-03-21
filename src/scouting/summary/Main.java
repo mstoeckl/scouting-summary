@@ -15,7 +15,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -24,18 +24,25 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 
 public class Main extends javax.swing.JFrame {
 
     public static final double DPI = 300.0;
+    private final Path cwd;
+    private String matchsource;
+    private String pitsource;
 
     /**
      * Creates new form Main
      */
     public Main() {
         initComponents();
+        cwd = new File("").getAbsoluteFile().toPath();
 
         saveItem.addActionListener(new ActionListener() {
             @Override
@@ -61,9 +68,82 @@ public class Main extends javax.swing.JFrame {
         jScrollPane1.getHorizontalScrollBar().setUnitIncrement(40);
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(40);
 
-        TSVDoc matches = new TSVDoc("matches.tsv");
-        TSVDoc pitscout = new TSVDoc("scouting.tsv");
+        final Preferences pref = Preferences.userRoot().node("scouting-summary");
+        setMatchSource(pref.get("match_source", "matches.tsv"));
+        setPitSource(pref.get("pit_source", "scouting.tsv"));
+
+        matchItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getPath("Choose Match Data File", new StringFunc() {
+                    @Override
+                    public void doIt(String s) {
+                        pref.put("match_source", s);
+                        setMatchSource(s);
+                        reload();
+                    }
+                });
+            }
+        });
+
+        scoutingItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getPath("Choose Pit Scouting Data File", new StringFunc() {
+                    @Override
+                    public void doIt(String s) {
+                        pref.put("pit_source", s);
+                        setPitSource(s);
+                        reload();
+                    }
+                });
+            }
+        });
+
+        reload();
+    }
+
+    private void setMatchSource(String s) {
+        matchsource = s;
+    }
+
+    private void setPitSource(String s) {
+        pitsource = s;
+    }
+
+    private void reload() {
+        teamDisplay1.setTeam(null);
+        teamDisplay2.setTeam(null);
+        teamDisplay3.setTeam(null);
+        teamDisplay4.setTeam(null);
+        teamDisplay5.setTeam(null);
+        teamDisplay6.setTeam(null);
+        records.clear();
+
+        System.out.println(matchsource);
+        System.out.println(pitsource);
+
+        TSVDoc matches = new TSVDoc(matchsource);
+        TSVDoc pitscout = new TSVDoc(pitsource);
+
         loadData(matches, pitscout);
+
+        forceUpdate(jFormattedTextField1, teamDisplay1);
+        forceUpdate(jFormattedTextField2, teamDisplay2);
+        forceUpdate(jFormattedTextField3, teamDisplay3);
+        forceUpdate(jFormattedTextField4, teamDisplay4);
+        forceUpdate(jFormattedTextField5, teamDisplay5);
+        forceUpdate(jFormattedTextField6, teamDisplay6);
+    }
+
+    private void forceUpdate(JFormattedTextField j, TeamDisplay d) {
+        Object e = j.getValue();
+        if (e != null) {
+            long l = (Long) j.getValue();
+            d.setTeam(records.get((int) l));
+        } else {
+            d.setTeam(null);
+        }
     }
 
     private void saveImage() {
@@ -93,9 +173,7 @@ public class Main extends javax.swing.JFrame {
                     Object o = evt.getOldValue();
                     if (n != o && n != null) {
                         TeamRecord r = records.get((int) (long) (Long) n);
-                        if (r != null) {
-                            d.setTeam(r);
-                        }
+                        d.setTeam(r);
                     }
                 }
             }
@@ -112,6 +190,30 @@ public class Main extends javax.swing.JFrame {
             public void focusLost(FocusEvent e) {
             }
         });
+    }
+
+    private static interface StringFunc {
+
+        public void doIt(String s);
+    }
+
+    private void getPath(String title, StringFunc func) {
+        final StringFunc fff = func;
+        final JFileChooser s = new JFileChooser(".");
+        final JFrame r = new JFrame(title);
+        r.add(s);
+        r.pack();
+        r.setVisible(true);
+        s.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Path target = s.getSelectedFile().getAbsoluteFile().toPath();
+                String p = cwd.relativize(target).toString();
+                fff.doIt(p);
+                r.dispose();
+            }
+        });
+
     }
 
     private final SortedMap<Integer, TeamRecord> records = new TreeMap<>();
@@ -168,12 +270,10 @@ public class Main extends javax.swing.JFrame {
     }
 
     private static String[] clip(String[] s, int cut) {
-        System.out.println(Arrays.toString(s));
         String[] out = new String[s.length - cut];
         for (int i = cut; i < s.length; i++) {
             out[i - cut] = s[i];
         }
-        System.out.println(Arrays.toString(out));
         return out;
     }
 
@@ -211,7 +311,8 @@ public class Main extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         saveItem = new javax.swing.JMenuItem();
-        openItem = new javax.swing.JMenuItem();
+        scoutingItem = new javax.swing.JMenuItem();
+        matchItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Scouting Summaries");
@@ -277,12 +378,15 @@ public class Main extends javax.swing.JFrame {
         jMenu1.setText("File");
 
         saveItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-        saveItem.setText("Save");
+        saveItem.setText("Save To Image");
         jMenu1.add(saveItem);
 
-        openItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
-        openItem.setText("Open");
-        jMenu1.add(openItem);
+        scoutingItem.setText("Set Pit Scouting Source");
+        jMenu1.add(scoutingItem);
+
+        matchItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        matchItem.setText("Set Match Data Source");
+        jMenu1.add(matchItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -310,8 +414,9 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JMenuItem openItem;
+    private javax.swing.JMenuItem matchItem;
     private javax.swing.JMenuItem saveItem;
+    private javax.swing.JMenuItem scoutingItem;
     private scouting.summary.TeamDisplay teamDisplay1;
     private scouting.summary.TeamDisplay teamDisplay2;
     private scouting.summary.TeamDisplay teamDisplay3;

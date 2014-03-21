@@ -26,19 +26,29 @@ public class TeamDisplay extends javax.swing.JPanel {
 
     public void setTeam(TeamRecord team) {
         teamData = team;
-        teamNum.setText(String.format("%d", teamData.getTeamNum()));
-        loadStats();
+        if (teamData == null) {
+            teamNum.setText("?????");
+            loadStats(new String[]{
+                "Here go: pit scouting info",
+                "So: what teams say they do",
+                "But: not what they do do",
+                "Like: what their bot could do"
+            });
+        } else {
+            teamNum.setText(String.format("%d", teamData.getTeamNum()));
+            loadStats(teamData.getScouting());
+        }
         display1.loadData(teamData);
         display2.loadData(teamData);
         display3.loadData(teamData);
         display4.loadData(teamData);
         display5.loadData(teamData);
         display6.loadData(teamData);
+
         this.repaint();
     }
 
-    private void loadStats() {
-        String[] s = teamData.getScouting();
+    private void loadStats(String[] s) {
         StringBuilder k = new StringBuilder();
         k.append("<html>");
         if (s.length >= 1) {

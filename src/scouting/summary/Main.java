@@ -270,6 +270,9 @@ public class Main extends javax.swing.JFrame {
     }
 
     private static String[] clip(String[] s, int cut) {
+        if (s.length <= cut) {
+            return new String[0];
+        }
         String[] out = new String[s.length - cut];
         for (int i = cut; i < s.length; i++) {
             out[i - cut] = s[i];

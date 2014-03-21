@@ -33,18 +33,33 @@ public class Chart extends JPanel {
         int h = this.getHeight();
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, w, h);
+        w--;
+        h--;
 
         if (data.length == 0) {
             return;
         }
 
-        int wh = w / data.length + 1;
+        int wh = w / data.length;
+
+        int q = data.length;
+        int p = w - wh * data.length;
+        int m = 0;
+
+        int xs = 0;
+
         int hs = h / max + 1;
 
         for (int x = 0; x < data.length; x++) {
             int[] d = data[x];
             int b = 0;
-            int o = x * wh;
+
+            int boost = 0;
+            m += p;
+            if (m >= q) {
+                m -= q;
+                boost = 1;
+            }
             for (int y = 0; y < shades.length; y++) {
                 int v = d[y];
                 if (v == 0) {
@@ -52,9 +67,10 @@ public class Chart extends JPanel {
                 }
                 int j = v * hs * scales[y];
 
-                drawRect(g, shades[y], o, h - b - j, wh, j);
+                drawRect(g, shades[y], xs, h - b - j, wh + boost, j);
                 b += j;
             }
+            xs += wh + boost;
         }
     }
 
@@ -64,9 +80,6 @@ public class Chart extends JPanel {
 
     private static void drawRect(Graphics2D g, int color, int x, int y, int w, int h) {
         Rectangle area = new Rectangle(x, y, w, h);
-        g.setColor(Color.BLACK);
-        g.fill(area);
-        area.grow(-1, -1);
         switch (color) {
             case FULL:
                 g.setColor(DARK);
@@ -79,6 +92,8 @@ public class Chart extends JPanel {
                 break;
         }
         g.fill(area);
+        g.setColor(Color.BLACK);
+        g.draw(area);
     }
 
     @Override

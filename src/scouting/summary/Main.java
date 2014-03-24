@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -29,20 +30,42 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class Main extends javax.swing.JFrame {
 
     public static final double DPI = 300.0;
-    private final Path cwd;
+    public static final Path cwd = new File("").getAbsoluteFile().toPath();
     private String matchsource;
     private String pitsource;
+    private String rulesource;
+
+    private final TeamDisplay[] teamDisplays;
+    private final JFormattedTextField[] textFields;
 
     /**
      * Creates new form Main
      */
     public Main() {
         initComponents();
-        cwd = new File("").getAbsoluteFile().toPath();
+        teamDisplays = new TeamDisplay[]{
+            teamDisplay1, teamDisplay2, teamDisplay3,
+            teamDisplay4, teamDisplay5, teamDisplay6
+        };
+        textFields = new JFormattedTextField[]{
+            jFormattedTextField1, jFormattedTextField2, jFormattedTextField3,
+            jFormattedTextField4, jFormattedTextField5, jFormattedTextField6
+        };
+        for (int i = 0; i < textFields.length; i++) {
+            bind(textFields[i], teamDisplays[i]);
+        }
 
         saveItem.addActionListener(new ActionListener() {
             @Override
@@ -58,49 +81,51 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        bind(jFormattedTextField1, teamDisplay1);
-        bind(jFormattedTextField2, teamDisplay2);
-        bind(jFormattedTextField3, teamDisplay3);
-        bind(jFormattedTextField4, teamDisplay4);
-        bind(jFormattedTextField5, teamDisplay5);
-        bind(jFormattedTextField6, teamDisplay6);
-
         jScrollPane1.getHorizontalScrollBar().setUnitIncrement(40);
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(40);
 
         final Preferences pref = Preferences.userRoot().node("scouting-summary");
-        setMatchSource(pref.get("match_source", "matches.tsv"));
-        setPitSource(pref.get("pit_source", "scouting.tsv"));
+        setMatchSource(pref.get("match_source", "data/qualifications.tsv"));
+        setPitSource(pref.get("pit_source", "data/pitscouting.tsv"));
+        setRuleSource(pref.get("rule_source", "data/rules.xml"));
 
-        matchItem.addActionListener(new ActionListener() {
+        addOpener(matchItem, "Choose Match Data File", new StringFunc() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                getPath("Choose Match Data File", new StringFunc() {
-                    @Override
-                    public void doIt(String s) {
-                        pref.put("match_source", s);
-                        setMatchSource(s);
-                        reload();
-                    }
-                });
+            public void doIt(String s) {
+                pref.put("match_source", s);
+                setMatchSource(s);
+                reload();
             }
         });
 
-        scoutingItem.addActionListener(new ActionListener() {
+        addOpener(scoutingItem, "Choose Pit Scouting Data File", new StringFunc() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                getPath("Choose Pit Scouting Data File", new StringFunc() {
-                    @Override
-                    public void doIt(String s) {
-                        pref.put("pit_source", s);
-                        setPitSource(s);
-                        reload();
-                    }
-                });
+            public void doIt(String s) {
+                pref.put("pit_source", s);
+                setPitSource(s);
+                reload();
+            }
+        });
+
+        addOpener(rulesItem, "Choose Graph Rules", new StringFunc() {
+            @Override
+            public void doIt(String s) {
+                pref.put("rule_source", s);
+                setRuleSource(s);
+                reload();
             }
         });
 
         reload();
+    }
+
+    private static void addOpener(JMenuItem i, final String title, final StringFunc f) {
+        i.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getPath(title, f);
+            }
+        });
     }
 
     private void setMatchSource(String s) {
@@ -111,29 +136,212 @@ public class Main extends javax.swing.JFrame {
         pitsource = s;
     }
 
+    private void setRuleSource(String s) {
+        rulesource = s;
+    }
+
     private void reload() {
-        teamDisplay1.setTeam(null);
-        teamDisplay2.setTeam(null);
-        teamDisplay3.setTeam(null);
-        teamDisplay4.setTeam(null);
-        teamDisplay5.setTeam(null);
-        teamDisplay6.setTeam(null);
+        for (TeamDisplay r : teamDisplays) {
+            r.setTeam(null);
+        }
         records.clear();
 
         System.out.println(matchsource);
         System.out.println(pitsource);
+        System.out.println(rulesource);
 
         TSVDoc matches = new TSVDoc(matchsource);
         TSVDoc pitscout = new TSVDoc(pitsource);
 
         loadData(matches, pitscout);
 
-        forceUpdate(jFormattedTextField1, teamDisplay1);
-        forceUpdate(jFormattedTextField2, teamDisplay2);
-        forceUpdate(jFormattedTextField3, teamDisplay3);
-        forceUpdate(jFormattedTextField4, teamDisplay4);
-        forceUpdate(jFormattedTextField5, teamDisplay5);
-        forceUpdate(jFormattedTextField6, teamDisplay6);
+        GraphRules[] rules = loadRules(rulesource);
+        for (TeamDisplay r : teamDisplays) {
+            r.setRules(rules);
+        }
+
+        for (int i = 0; i < textFields.length; i++) {
+            forceUpdate(textFields[i], teamDisplays[i]);
+        }
+    }
+
+    private static Iterable<Element> getChildren(final Element e) {
+        final NodeList l = e.getChildNodes();
+        return new Iterable<Element>() {
+            @Override
+            public Iterator<Element> iterator() {
+                return new Iterator<Element>() {
+                    int i = 0;
+
+                    private void advance() {
+                        while (i < l.getLength() && !(l.item(i) instanceof Element)) {
+                            i++;
+                        }
+                    }
+
+                    @Override
+                    public boolean hasNext() {
+                        advance();
+                        return i < l.getLength();
+                    }
+
+                    @Override
+                    public Element next() {
+                        Element n = (Element) l.item(i);
+                        i++;
+                        advance();
+                        return (Element) n;
+                    }
+
+                    @Override
+                    public void remove() {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+                };
+            }
+        };
+    }
+
+    public static void maltypeError(Element e) {
+        System.err.format("Maltyped child: |%s|\n", e.getTagName());
+    }
+
+    public static void maltypeError(Element e, String expected) {
+        System.err.format("Maltyped child: |%s| wanted |%s|\n", e.getTagName(), expected);
+    }
+
+    private static void loadBlock(ArrayList<Element> a, Element e) {
+        for (Element sub : getChildren(e)) {
+            if (sub.getTagName().equals("block")) {
+                a.add(sub);
+            } else {
+                maltypeError(sub);
+            }
+        }
+    }
+
+    private static int intAttr(Element e, String attr, int def) {
+        String scale = e.getAttribute(attr);
+        if (scale.isEmpty()) {
+            return def;
+        }
+        try {
+            return Integer.parseInt(scale);
+        } catch (NumberFormatException ex) {
+            return def;
+        }
+    }
+
+    private static String strAttr(Element e, String attr, String def) {
+        if (e.hasAttribute(attr)) {
+            String s = e.getAttribute(attr);
+            if (s.isEmpty()) {
+                return def;
+            }
+            return s;
+        }
+        return def;
+    }
+
+    private GraphRules[] loadRules(String path) {
+        Document document = null;
+        try {
+            File file = new File(path);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            document = db.parse(file);
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            e.printStackTrace(System.err);
+            return new GraphRules[0];
+        }
+        Element root = document.getDocumentElement();
+        root.normalize();
+
+        ArrayList<Element> plot = new ArrayList<>();
+        ArrayList<Element> success = new ArrayList<>();
+        ArrayList<Element> failure = new ArrayList<>();
+
+        ArrayList<GraphRules> graphs = new ArrayList<>();
+
+        ArrayList<SII> kp = new ArrayList<>();
+        ArrayList<SII> ks = new ArrayList<>();
+        ArrayList<SII> kf = new ArrayList<>();
+
+        for (Element graph : getChildren(root)) {
+            if (!graph.getTagName().equals("graph")) {
+                continue;
+            }
+
+            int plotmax = 1;
+            for (Element e : getChildren(graph)) {
+                switch (e.getTagName()) {
+                    case "plot":
+                        if (e.hasAttribute("max")) {
+                            try {
+                                plotmax = Integer.parseInt(e.getAttribute("max"));
+                            } catch (NumberFormatException ex) {
+                                ex.printStackTrace(System.err);
+                            }
+                        }
+                        loadBlock(plot, e);
+                        break;
+                    case "success":
+                        loadBlock(success, e);
+                        break;
+                    case "failure":
+                        loadBlock(failure, e);
+                        break;
+                    default:
+                        maltypeError(e);
+                        break;
+                }
+            }
+
+            String name = graph.getAttribute("name");
+            if (name.isEmpty()) {
+                name = "???";
+            }
+
+            for (Element e : success) {
+                ks.add(new SII(strAttr(e, "key", "???"), 0, intAttr(e, "scale", 1)));
+            }
+            for (Element e : failure) {
+                kf.add(new SII(strAttr(e, "key", "???"), 0, intAttr(e, "scale", 1)));
+            }
+            for (Element e : plot) {
+                String k = strAttr(e, "color", "BLACK");
+                int ch;
+                switch (k) {
+                    case "BLACK":
+                        ch = Chart.FULL;
+                        break;
+                    case "GRAY":
+                        ch = Chart.MEDIUM;
+                        break;
+                    case "WHITE":
+                        ch = Chart.CLEAR;
+                        break;
+                    default:
+                        ch = Chart.FULL;
+                        break;
+
+                }
+                kp.add(new SII(strAttr(e, "key", "???"), ch, intAttr(e, "scale", 1)));
+            }
+            graphs.add(new GraphRules(name,
+                    ks.toArray(new SII[ks.size()]),
+                    kf.toArray(new SII[kf.size()]),
+                    plotmax,
+                    kp.toArray(new SII[kp.size()])));
+            plot.clear();
+            success.clear();
+            failure.clear();
+            ks.clear();
+            kf.clear();
+            kp.clear();
+        }
+
+        return graphs.toArray(new GraphRules[graphs.size()]);
     }
 
     private void forceUpdate(JFormattedTextField j, TeamDisplay d) {
@@ -197,10 +405,11 @@ public class Main extends javax.swing.JFrame {
         public void doIt(String s);
     }
 
-    private void getPath(String title, StringFunc func) {
+    private static void getPath(String title, StringFunc func) {
         final StringFunc fff = func;
         final JFileChooser s = new JFileChooser(".");
         final JFrame r = new JFrame(title);
+        r.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         r.add(s);
         r.pack();
         r.setVisible(true);
@@ -208,12 +417,14 @@ public class Main extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Path target = s.getSelectedFile().getAbsoluteFile().toPath();
+                if (target == null) {
+                    return;
+                }
                 String p = cwd.relativize(target).toString();
                 fff.doIt(p);
                 r.dispose();
             }
         });
-
     }
 
     private final SortedMap<Integer, TeamRecord> records = new TreeMap<>();
@@ -250,7 +461,11 @@ public class Main extends javax.swing.JFrame {
         for (String[] kl : sct.data) {
             String[] v = new String[kl.length - 1];
             System.arraycopy(kl, 1, v, 0, v.length);
-            ms.put(Integer.parseInt(kl[0]), v);
+            try {
+                ms.put(Integer.parseInt(kl[0]), v);
+            } catch (NumberFormatException e) {
+                e.printStackTrace(System.err);
+            }
         }
 
         String[] matchheader = clip(mts.header, 1);
@@ -314,6 +529,8 @@ public class Main extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         saveItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        rulesItem = new javax.swing.JMenuItem();
         scoutingItem = new javax.swing.JMenuItem();
         matchItem = new javax.swing.JMenuItem();
 
@@ -383,6 +600,10 @@ public class Main extends javax.swing.JFrame {
         saveItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         saveItem.setText("Save To Image");
         jMenu1.add(saveItem);
+        jMenu1.add(jSeparator1);
+
+        rulesItem.setText("Set Graph Rules");
+        jMenu1.add(rulesItem);
 
         scoutingItem.setText("Set Pit Scouting Source");
         jMenu1.add(scoutingItem);
@@ -417,7 +638,9 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JMenuItem matchItem;
+    private javax.swing.JMenuItem rulesItem;
     private javax.swing.JMenuItem saveItem;
     private javax.swing.JMenuItem scoutingItem;
     private scouting.summary.TeamDisplay teamDisplay1;

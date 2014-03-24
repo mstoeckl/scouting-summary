@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <!--
+    A maximum of six graphs are available.
+    Anything beyond that will be ignored.
+    The primary argument is necessary
+    (graph->name, plot->max, block/field->key)
+    -->
+    <graph name="Auto">
+        <plot max="3">
+            <block key="AutoHighHot" color="BLACK"/>
+            <block key="AutoHighCold" color="GRAY"/>
+            <block key="AutoLowHot" color="GRAY"/>
+            <block key="AutoLowCold" color="GRAY"/>
+            <block key="AutoMiss" scale="1" color="WHITE"/>
+        </plot>
+        <success>
+            <block key="AutoHighHot" scale="1"/>
+            <block key="AutoHighCold"/>
+            <block key="AutoLowHot"/>
+            <block key="AutoLowCold"/>
+        </success>
+        <failure>
+            <block key="AutoMiss" scale="1"/>
+        </failure>
+    </graph>
+    <graph name="Misc">
+        <plot max="4">
+            <block key="MiscFoul" color="BLACK"/>
+            <block key="MiscStuckBall" color="GRAY"/>
+            <block key="MiscDeadBot" color="WHITE"/>
+        </plot>
+        <success>
+            <block key="MiscFoul"/>
+        </success>
+    </graph>
+    <graph name="Truss">
+        <plot max="10">
+            <block key="TrussHP" color="BLACK"/>
+            <block key="TrussField" color="GRAY"/>
+            <block key="TrussFail" color="WHITE"/>
+        </plot>
+        <success>
+            <block key="TrussHP"/>
+            <block key="TrussField"/>
+        </success>
+        <failure>
+            <block key="TrussFail"/>
+        </failure>
+    </graph>
+    <graph name="Load">
+        <plot max="10">
+            <block key="Pickups"/>
+        </plot>
+        <success>
+            <block key="Pickups"/>
+        </success>
+    </graph>
+    <graph name="High">
+        <plot max="10">
+            <block key="High" color="BLACK"/>
+            <block key="HighMiss" color="WHITE"/>
+        </plot>
+        <success>
+            <block key="High"/>
+        </success>
+        <failure>
+            <block key="HighMiss"/>
+        </failure>
+    </graph>
+    <graph name="Low">
+        <plot max="10">
+            <block key="LowGoal" color="BLACK"/>
+        </plot>
+        <success>
+            <block key="LowGoal"/>
+        </success>
+    </graph>
+</root>

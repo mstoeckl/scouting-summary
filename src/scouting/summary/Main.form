@@ -17,6 +17,13 @@
                 <Property name="text" type="java.lang.String" value="Save To Image"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="rulesItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Set Graph Rules"/>
+              </Properties>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="scoutingItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Set Pit Scouting Source"/>

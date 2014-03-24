@@ -12,12 +12,13 @@ public class Display extends javax.swing.JPanel {
      */
     public Display() {
         initComponents();
+        rules = GraphRules.NullRules;
     }
 
     private GraphRules rules;
 
     public void setType(GraphRules g) {
-        nameField.setText(g.getName());
+        nameField.setText(g.name);
         rules = g;
     }
 

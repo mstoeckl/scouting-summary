@@ -7,6 +7,8 @@ package scouting.summary;
 
 public class TeamDisplay extends javax.swing.JPanel {
 
+    private final Display[] displays;
+
     /**
      * Creates new form TeamDisplay
      */
@@ -14,12 +16,19 @@ public class TeamDisplay extends javax.swing.JPanel {
         initComponents();
         teamData = null;
 
-        display1.setType(GraphRules.AutoRules);
-        display2.setType(GraphRules.MiscRules);
-        display3.setType(GraphRules.TrussRules);
-        display4.setType(GraphRules.PickupRules);
-        display5.setType(GraphRules.HighRules);
-        display6.setType(GraphRules.LowRules);
+        displays = new Display[]{
+            display1, display2, display3, display4, display5, display6
+        };
+    }
+
+    public void setRules(GraphRules[] r) {
+        int i = 0;
+        for (; i < r.length && i < displays.length; i++) {
+            displays[i].setType(r[i]);
+        }
+        for (; i < displays.length; i++) {
+            displays[i].setType(GraphRules.NullRules);
+        }
     }
 
     private TeamRecord teamData;

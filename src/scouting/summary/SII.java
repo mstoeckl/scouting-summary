@@ -5,21 +5,21 @@
  */
 package scouting.summary;
 
-public class SKS {
+public class SII {
 
-    public final int intensity;
+    public final int color;
     public final String key;
     public final int scale;
 
-    public SKS(String s, int i, int scale) {
+    public SII(String s, int color, int scale) {
         this.key = s;
-        this.intensity = i;
+        this.color = color;
         this.scale = scale;
     }
 
-    public SKS(String s, int i) {
+    public SII(String s, int color) {
         this.key = s;
-        this.intensity = i;
+        this.color = color;
         this.scale = 1;
     }
 

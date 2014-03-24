@@ -1,6 +1,7 @@
 #!/bin/sh python3
 
 import re
+import os,sys
 
 fields = ["Team","Match"
           ,"AutoHighHot","AutoHighCold","AutoLowHot","AutoLowCold","AutoMiss"
@@ -179,23 +180,31 @@ def writetsv(filename, header, data):
         for line in data:
             f.write("\t".join(map(str, line)) + "\n")
 
-header, data = readcsv("aerialassist.csv")
-practice = []
-qualification = []
-elimination = []
-for x in data:
-    mode, line = convert(x, header)
-    if mode == "Practice":
-        practice.append(line)
-    if mode == "Qualification":
-        qualification.append(line)
-    if mode == "Elimination":
-        elimination.append(line)
-writetsv("practice.tsv",fields, practice)
-writetsv("qualification.tsv",fields, qualification)
-writetsv("elimination.tsv",fields, elimination)
+def setpath():
 
+    path = os.path.abspath(sys.argv[0])
+    folder = os.path.split(path)[0]
+    os.chdir(folder)
 
+setpath()
 
-
-
+try:
+    header, data = readcsv("aerialassist.csv")
+    practice = []
+    qualification = []
+    elimination = []
+    for x in data:
+        mode, line = convert(x, header)
+        if mode == "Practice":
+            practice.append(line)
+        if mode == "Qualification":
+            qualification.append(line)
+        if mode == "Elimination":
+            elimination.append(line)
+    writetsv("practice.tsv",fields, practice)
+    writetsv("qualification.tsv",fields, qualification)
+    writetsv("elimination.tsv",fields, elimination)
+except BaseException:
+    print("Error occured")
+    
+      

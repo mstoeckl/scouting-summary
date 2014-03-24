@@ -43,8 +43,66 @@ public class TeamRecord {
         this.team = team;
     }
 
+    public double[] getFailures(GraphRules g) {
+        return getMetric(g.con);
+    }
+
+    public int[][] getGraphData(GraphRules g) {
+        SII[] p = g.plot;
+        int[][] d = new int[getMatchCount()][p.length];
+        for (int j = 0; j < p.length; j++) {
+            int k = keyToInt(p[j].key);
+            for (int i = 0; i < d.length; i++) {
+                d[i][j] = matches[i][k];
+            }
+        }
+        return d;
+    }
+
+    public int getMatchCount() {
+        return matches.length;
+    }
+
+    public int getMaxHeight(GraphRules g) {
+        return g.max;
+    }
+
+    public int[] getScales(GraphRules g) {
+        SII[] p = g.plot;
+        int[] d = new int[p.length];
+        for (int i = 0; i < d.length; i++) {
+            d[i] = p[i].scale;
+        }
+        return d;
+    }
+
+    public String[] getScouting() {
+        return scouting;
+    }
+
+    public int[] getShades(GraphRules g) {
+        SII[] p = g.plot;
+        int[] d = new int[p.length];
+        for (int i = 0; i < d.length; i++) {
+            d[i] = p[i].color;
+        }
+        return d;
+    }
+
+    public double[] getSuccesses(GraphRules g) {
+        return getMetric(g.pro);
+    }
+
     public int getTeamNum() {
         return team;
+    }
+
+    private int getField(int match, String key) {
+        int idx = keyToInt(key);
+        if (idx == -1) {
+            return 0;
+        }
+        return matches[match][idx];
     }
 
     private int getFieldCombination(SII[] combo, int match) {
@@ -63,71 +121,13 @@ public class TeamRecord {
         return hist(v);
     }
 
-    public double[] getSuccesses(GraphRules g) {
-        return getMetric(g.pro);
-    }
-
-    public double[] getFailures(GraphRules g) {
-        return getMetric(g.con);
-    }
-
-    public int getMatchCount() {
-        return matches.length;
-    }
-
-    public int getMaxHeight(GraphRules g) {
-        return g.max;
-    }
-
-    public int[] getShades(GraphRules g) {
-        SII[] p = g.plot;
-        int[] d = new int[p.length];
-        for (int i = 0; i < d.length; i++) {
-            d[i] = p[i].color;
-        }
-        return d;
-    }
-
-    public int[] getScales(GraphRules g) {
-        SII[] p = g.plot;
-        int[] d = new int[p.length];
-        for (int i = 0; i < d.length; i++) {
-            d[i] = p[i].scale;
-        }
-        return d;
-    }
-
-    public int[][] getGraphData(GraphRules g) {
-        SII[] p = g.plot;
-        int[][] d = new int[getMatchCount()][p.length];
-        for (int j = 0; j < p.length; j++) {
-            int k = keyToInt(p[j].key);
-            for (int i = 0; i < d.length; i++) {
-                d[i][j] = matches[i][k];
-            }
-        }
-        return d;
-    }
-
-    public String[] getScouting() {
-        return scouting;
-    }
-
     private int keyToInt(String key) {
         for (int i = 0; i < matchheader.length; i++) {
             if (matchheader[i].equals(key)) {
                 return i;
             }
         }
-        System.err.format("Can't find key %s\n", key);
+        System.err.format("Can't find key %s%n", key);
         return -1;
-    }
-
-    public int getField(int match, String key) {
-        int idx = keyToInt(key);
-        if (idx == -1) {
-            return 0;
-        }
-        return matches[match][idx];
     }
 }

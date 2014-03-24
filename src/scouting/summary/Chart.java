@@ -13,6 +13,41 @@ import javax.swing.JPanel;
 
 public class Chart extends JPanel {
 
+    public static final int CLEAR = 1;
+
+    public static final int FULL = 0;
+    public static final int MEDIUM = 2;
+
+    private static final Color DARK = new Color(50, 50, 50);
+    private static final Color LIGHT = new Color(255, 255, 255);
+
+    private static final Color MID = new Color(150, 150, 150);
+
+    private static void drawRect(Graphics2D g, int color, int x, int y, int w, int h) {
+        Rectangle area = new Rectangle(x, y, w, h);
+        switch (color) {
+            default:
+            case FULL:
+                g.setColor(DARK);
+                break;
+            case MEDIUM:
+                g.setColor(MID);
+                break;
+            case CLEAR:
+                g.setColor(LIGHT);
+                break;
+        }
+        g.fill(area);
+        g.setColor(Color.BLACK);
+        g.draw(area);
+    }
+
+    private int[][] data;
+    private int max;
+
+    private int[] scales;
+    private int[] shades;
+
     /**
      * Creates new form Chart
      */
@@ -24,9 +59,11 @@ public class Chart extends JPanel {
         max = 1;
     }
 
-    public static final int FULL = 0;
-    public static final int CLEAR = 1;
-    public static final int MEDIUM = 2;
+    @Override
+
+    public void paintComponent(Graphics g) {
+        paintIt((Graphics2D) g);
+    }
 
     public void paintIt(Graphics2D g) {
         int w = this.getWidth();
@@ -50,8 +87,7 @@ public class Chart extends JPanel {
 
         int hs = h / max + 1;
 
-        for (int x = 0; x < data.length; x++) {
-            int[] d = data[x];
+        for (int[] d : data) {
             int b = 0;
 
             int boost = 0;
@@ -74,54 +110,20 @@ public class Chart extends JPanel {
         }
     }
 
-    private static final Color DARK = new Color(50, 50, 50);
-    private static final Color MID = new Color(150, 150, 150);
-    private static final Color LIGHT = new Color(255, 255, 255);
-
-    private static void drawRect(Graphics2D g, int color, int x, int y, int w, int h) {
-        Rectangle area = new Rectangle(x, y, w, h);
-        switch (color) {
-            case FULL:
-                g.setColor(DARK);
-                break;
-            case MEDIUM:
-                g.setColor(MID);
-                break;
-            case CLEAR:
-                g.setColor(LIGHT);
-                break;
-        }
-        g.fill(area);
-        g.setColor(Color.BLACK);
-        g.draw(area);
+    public void setData(int[][] d) {
+        data = d;
     }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        paintIt((Graphics2D) g);
-    }
-
-    private int max;
 
     public void setMax(int m) {
         max = m;
     }
 
-    private int[][] data;
-
-    public void setData(int[][] d) {
-        data = d;
+    public void setScales(int[] s) {
+        scales = s;
     }
-    private int[] shades;
 
     public void setShades(int[] s) {
         shades = s;
-    }
-
-    private int[] scales;
-
-    public void setScales(int[] s) {
-        scales = s;
     }
 
     /**

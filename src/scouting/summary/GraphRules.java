@@ -10,12 +10,11 @@ public class GraphRules {
     public static final GraphRules NullRules = new GraphRules("???",
             new SII[0], new SII[0], 1, new SII[0]);
 
-    public final String name;
-    public final int max;
-
-    public final SII[] pro;
     public final SII[] con;
+    public final int max;
+    public final String name;
     public final SII[] plot;
+    public final SII[] pro;
 
     public GraphRules(final String name, final SII[] pro,
             final SII[] con, final int max, final SII[] chart) {

@@ -173,12 +173,6 @@ public class Main extends javax.swing.JFrame {
                 return new Iterator<Element>() {
                     int i = 0;
 
-                    private void advance() {
-                        while (i < l.getLength() && !(l.item(i) instanceof Element)) {
-                            i++;
-                        }
-                    }
-
                     @Override
                     public boolean hasNext() {
                         advance();
@@ -197,17 +191,19 @@ public class Main extends javax.swing.JFrame {
                     public void remove() {
                         throw new UnsupportedOperationException("Not supported yet.");
                     }
+
+                    private void advance() {
+                        while (i < l.getLength() && !(l.item(i) instanceof Element)) {
+                            i++;
+                        }
+                    }
                 };
             }
         };
     }
 
-    public static void maltypeError(Element e) {
-        System.err.format("Maltyped child: |%s|\n", e.getTagName());
-    }
-
-    public static void maltypeError(Element e, String expected) {
-        System.err.format("Maltyped child: |%s| wanted |%s|\n", e.getTagName(), expected);
+    private static void maltypeError(Element e) {
+        System.err.format("Maltyped child: |%s|%n", e.getTagName());
     }
 
     private static void loadBlock(ArrayList<Element> a, Element e) {
@@ -244,7 +240,7 @@ public class Main extends javax.swing.JFrame {
     }
 
     private GraphRules[] loadRules(String path) {
-        Document document = null;
+        Document document;
         try {
             File file = new File(path);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -387,17 +383,26 @@ public class Main extends javax.swing.JFrame {
             }
         });
         j.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
-        j.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                j.setText(j.getText());
-                j.selectAll();
-            }
+        j.addFocusListener(new SelectOnFocus(j));
+    }
 
-            @Override
-            public void focusLost(FocusEvent e) {
-            }
-        });
+    private static class SelectOnFocus implements FocusListener {
+
+        private final JFormattedTextField field;
+
+        public SelectOnFocus(JFormattedTextField p) {
+            this.field = p;
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            field.setText(field.getText());
+            field.selectAll();
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+        }
     }
 
     private static interface StringFunc {

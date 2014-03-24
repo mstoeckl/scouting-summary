@@ -9,11 +9,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TSVDoc {
 
-    String[] header;
     String[][] data;
+
+    String[] header;
 
     /**
      * Delimeters: Tabs
@@ -24,14 +27,24 @@ public class TSVDoc {
 
         String[] lines;
         ArrayList<String> s = new ArrayList<>();
+
+        BufferedReader r = null;
         try {
-            BufferedReader r = new BufferedReader(new FileReader(file));
+            r = new BufferedReader(new FileReader(file));
             String u;
             while ((u = r.readLine()) != null) {
                 s.add(u);
             }
         } catch (IOException e) {
             e.printStackTrace(System.err);
+        } finally {
+            try {
+                if (r != null) {
+                    r.close();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(TSVDoc.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         lines = s.toArray(new String[s.size()]);
 

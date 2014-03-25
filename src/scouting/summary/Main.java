@@ -421,10 +421,12 @@ public class Main extends javax.swing.JFrame {
         s.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Path target = s.getSelectedFile().getAbsoluteFile().toPath();
-                if (target == null) {
+                File file = s.getSelectedFile();
+                if (file == null) {
+                    r.dispose();
                     return;
                 }
+                Path target = file.getAbsoluteFile().toPath();
                 String p = cwd.relativize(target).toString();
                 fff.doIt(p);
                 r.dispose();

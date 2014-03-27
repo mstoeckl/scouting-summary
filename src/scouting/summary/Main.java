@@ -67,13 +67,13 @@ public class Main extends javax.swing.JFrame {
             bind(textFields[i], teamDisplays[i]);
         }
 
-        saveItem.addActionListener(new ActionListener() {
+        addSaver(saveItem, "Select image output path", new StringFunc() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void doIt(final String s) {
                 Thread save = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        saveImage();
+                        saveImage(s);
                     }
                 });
                 save.setDaemon(false);
@@ -123,7 +123,16 @@ public class Main extends javax.swing.JFrame {
         i.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                getPath(title, f);
+                getPath(title, f, JFileChooser.OPEN_DIALOG);
+            }
+        });
+    }
+
+    private static void addSaver(JMenuItem i, final String title, final StringFunc f) {
+        i.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getPath(title, f, JFileChooser.SAVE_DIALOG);
             }
         });
     }
@@ -350,7 +359,7 @@ public class Main extends javax.swing.JFrame {
         }
     }
 
-    private void saveImage() {
+    private void saveImage(String path) {
         double real_x = (double) display.getWidth();
         double real_y = (double) display.getHeight();
         int w = (int) (7.5 * DPI);
@@ -362,7 +371,7 @@ public class Main extends javax.swing.JFrame {
         display.print(g);
         g.dispose();
         try {
-            ImageIO.write(b, "PNG", new File("output.png"));
+            ImageIO.write(b, "PNG", new File(path));
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -410,10 +419,11 @@ public class Main extends javax.swing.JFrame {
         public void doIt(String s);
     }
 
-    private static void getPath(String title, StringFunc func) {
+    private static void getPath(String title, StringFunc func, int type) {
         final StringFunc fff = func;
         final JFileChooser s = new JFileChooser(".");
         final JFrame r = new JFrame(title);
+        s.setDialogType(type);
         r.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         r.add(s);
         r.pack();
@@ -421,14 +431,19 @@ public class Main extends javax.swing.JFrame {
         s.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                File file = s.getSelectedFile();
-                if (file == null) {
-                    r.dispose();
-                    return;
+                switch (e.getActionCommand()) {
+                    case JFileChooser.APPROVE_SELECTION:
+                        File file = s.getSelectedFile();
+                        Path target = file.getAbsoluteFile().toPath();
+                        String p = cwd.relativize(target).toString();
+                        fff.doIt(p);
+                        break;
+                    case JFileChooser.CANCEL_SELECTION:
+                        break;
+                    default:
+                        System.out.format("File Choose |%s|\n", e.getActionCommand());
+                        break;
                 }
-                Path target = file.getAbsoluteFile().toPath();
-                String p = cwd.relativize(target).toString();
-                fff.doIt(p);
                 r.dispose();
             }
         });

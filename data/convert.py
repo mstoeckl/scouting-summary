@@ -9,14 +9,14 @@ fields = ["Team","Match"
           ,"High","HighMiss"
           ,"MiscFoul","MiscStuckBall","MiscDeadBot"
           ,"Pickups","LowGoal"
-          ,"EtcMobility","EtcNoShow","EtcDefending","EtcDefended","EtcGoalie","EtcGoalieBlock"]
+          ,"EtcMobility","EtcNoShow","EtcDefending","EtcHPLoad","EtcGoalie","EtcGoalieBlock"]
 
 incoming = ["Team","Match","Match Type","No Show"
             ,"A Start Pos","A High","A Low","A Missed"
             ,"A Ball","A Hot","A Mobility","A Goalie Block"
-            ,"High","Low","Truss","Catch","Pickup","Off Missed/Blocked"
-            ,"Def Missed/Blocked","Foul","Tech Foul","Truss to HP"
-            ,"Played D","Had D","Stuck","Dead"]
+            ,"High","Low","Truss","Catch","Pickup","High Missed"
+            ,"Shots Blocked","Foul","Tech Foul","Truss to HP"
+            ,"Played D","HP Load","Stuck","Dead"]
 
 def readcsv(filename):
     with open(filename) as f:
@@ -156,7 +156,7 @@ def convert(line, header):
         o["TrussField"] = iconv(d["Truss"])
     o["TrussFail"] = 0
     o["High"] = iconv(d["High"])
-    o["HighMiss"] = iconv(d["Off Missed/Blocked"])
+    o["HighMiss"] = iconv(d["High Missed"])
     o["MiscFoul"] = 0
     o["MiscStuckBall"] = bconv(d["Stuck"])
     o["MiscDeadBot"] = bconv(d["Dead"])
@@ -165,7 +165,7 @@ def convert(line, header):
     o["EtcMobility"] = bconv(d["A Mobility"])
     o["EtcNoShow"] = bconv(d["No Show"])
     o["EtcDefending"] = bconv(d["Played D"])
-    o["EtcDefended"] = bconv(d["Had D"])
+    o["EtcHPLoad"] = bconv(d["HP Load"])
     if d["A Start Pos"] == "Goalie":
         o["EtcGoalie"] = 1
     else:
@@ -186,9 +186,7 @@ def setpath():
     folder = os.path.split(path)[0]
     os.chdir(folder)
 
-setpath()
-
-try:
+def main():
     header, data = readcsv("aerialassist.csv")
     practice = []
     qualification = []
@@ -204,7 +202,9 @@ try:
     writetsv("practice.tsv",fields, practice)
     writetsv("qualification.tsv",fields, qualification)
     writetsv("elimination.tsv",fields, elimination)
-except BaseException:
-    print("Error occured")
+
+if __name__ == "__main__":
+    setpath()
+    main()
     
       

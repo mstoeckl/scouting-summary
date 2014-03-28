@@ -1,1 +1,2 @@
-Team	Match	AutoHighHot	AutoHighCold	AutoLowHot	AutoLowCold	AutoMiss	TrussField	TrussHP	TrussFail	High	HighMiss	MiscFoul	MiscStuckBall	MiscDeadBot	Pickups	LowGoal	EtcMobility	EtcNoShow	EtcDefending	EtcDefended	EtcGoalie	EtcGoalieBlock
+Team	Match	AutoHighHot	AutoHighCold	AutoLowHot	AutoLowCold	AutoMiss	TrussField	TrussHP	TrussFail	High	HighMiss	MiscFoul	MiscStuckBall	MiscDeadBot	Pickups	LowGoal	EtcMobility	EtcNoShow	EtcDefending	EtcHPLoad	EtcGoalie	EtcGoalieBlock
+5254	6	0	0	0	2	1	0	0	0	0	0	0	0	1	0	0	1	0	1	0	0	0
